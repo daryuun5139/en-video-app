@@ -1,0 +1,12 @@
+.tiptap p:has(.ProseMirror-trailingBreak) {
+  background-color: rgb(241 245 249);
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.tiptap p:has(.ProseMirror-trailingBreak)::before {
+  color: black;
+  content: attr(data-placeholder);
+  font-size: 14px;
+  padding-left: 3px;
+}
