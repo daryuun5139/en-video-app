@@ -1,7 +1,7 @@
-.tiptap p:has(.ProseMirror-trailingBreak) {
+.tiptap p:last-child {
   background-color: rgb(241 245 249);
   border-radius: 5px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
 }
 
 .tiptap p:has(.ProseMirror-trailingBreak)::before {
@@ -9,4 +9,30 @@
   content: attr(data-placeholder);
   font-size: 14px;
   padding-left: 3px;
+}
+
+.open-check1:checked ~ .open-content1 {
+  height: 500px;
+  overflow: scroll;
+}
+
+.open-label1:before {
+  content: "さらに表示する";
+}
+
+.open-check1:checked ~ .open-label1:before {
+  content: "もとに戻す";
+}
+
+/* ---------------------------------------------------- */
+.open-check2:checked ~ .open-content2 {
+  height: 0px;
+}
+
+.open-label2:before {
+  content: url(../../public/icons/minus-square.svg);
+}
+
+.open-check2:checked ~ .open-label2:before {
+  content: url(../../public/icons/plus-square.svg);
 }

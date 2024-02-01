@@ -1,82 +1,120 @@
+// 動画画面下Subtitle部分
 "use client";
 
-import React, { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import { ChangeEvent, useEffect, useState } from "react";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
-import { useRecoilValue } from "recoil";
-import { curTimeState } from "@/lib/atoms/getCurrenTime";
+import { useRecoilValue, useRecoilState } from "recoil";
+import { currentTimeState } from "@/lib/atoms/getCurrentTime";
+import { subtitleCheckedList } from "@/lib/atoms/subtitleCheckedList";
 
 type Props = {
-  subtitleList: subtitleContent[];
+  subtitleList: subtitleData[];
 };
-type subtitleContent = {
+type subtitleData = {
+  index: number;
   time: string;
+  seconds?: number | undefined;
   text: string;
 };
 
 const SubtitleBox = ({ subtitleList }: Props) => {
-  const [current, setCurrent] = useState(0);
-  const curTime = useRecoilValue(curTimeState);
+  const [currentSubtitle, setCurrentSubtitle] = useState(0);
+  const currentTime = useRecoilValue(currentTimeState);
+  const [checkedList, setCheckedList] = useRecoilState(subtitleCheckedList);
+
+  const removeCheckedList = (list: number[], index: number) => {
+    return [...list.slice(0, index), ...list.slice(index + 1)];
+  };
+
+  // subtitleCardにチェックを入れたらcheckedListに値を入れる,はずしたらcheckedListから値を除く
+  const onChecked = (event: ChangeEvent<HTMLInputElement>) => {
+    const targetValue = Number(event.currentTarget.value);
+    if (event.target.checked === true) {
+      if (!checkedList.includes(targetValue)) {
+        setCheckedList((list) => [...list, targetValue]);
+      }
+    } else {
+      const targetIndex = checkedList.indexOf(targetValue);
+      const newList = removeCheckedList(checkedList, targetIndex);
+      setCheckedList(newList);
+    }
+  };
+
+  // subtitleを時間ごとに切り替える
+  useEffect(() => {
+    for (let i = 0; i < subtitleList.length; i++) {
+      if (Math.floor(currentTime + 1) === Number(subtitleList[i]["seconds"])) {
+        setCurrentSubtitle(i);
+        break;
+      }
+    }
+  }, [currentTime]);
+
+  // onClickで前のカードに戻る(previousCard)、次のカードに進む(nextCard)
   const previousCard = () => {
-    setCurrent(current - 1);
+    setCurrentSubtitle(currentSubtitle - 1);
   };
   const nextCard = () => {
-    setCurrent(current + 1);
+    setCurrentSubtitle(currentSubtitle + 1);
   };
 
-  const updateCard = () => {
-    //現在の再生時間を取得、それに一番近いインデックスまでジャンプ
-    // curTime = player.getCurrentTime();
-    // index = 0;
-    // for (index = 0; index < srtList.length; index++) {
-    //   if (curTime < srtList[index]["time"]) {
-    //     break;
-    //   }
-    // }
-    // if (index > 0) {
-    //   index = index - 1;
-    // }
-    // selectSrt(index);
-    // setTimeout(updatePosition, 500);
-  };
-
+  // subtitleのカードを表示--------------------------------------
   const subtitleCard = subtitleList.map((content, index) => {
+    const checkedOrNot = (): boolean => {
+      if (checkedList.includes(currentSubtitle)) {
+        return true;
+      } else {
+        return false;
+      }
+    };
     return (
-      <CardContent key={index} className="flex items-center justify-center gap-3 py-3">
-        <Checkbox className="h-4 w-4" />
-        <div>
-          <p className="text-sm">{content.time}</p>
-          <p className="text-base">{content.text}</p>
+      <>
+        <div key={index} className="flex h-full w-full flex-col items-start">
+          <input
+            type="checkbox"
+            id={`${index}`}
+            className="peer absolute left-20 top-1/3 h-7 w-7"
+            onChange={onChecked}
+            value={index}
+            checked={checkedOrNot()}
+          />
+          <label
+            htmlFor={`${index}`}
+            className="h-full w-full rounded-sm border-slate-500 hover:cursor-pointer hover:border-2 hover:bg-slate-300 peer-checked:border-2 peer-checked:bg-slate-300"
+          >
+            <p className="ml-14 flex text-sm font-extralight">{content.time}</p>
+            <p className="ml-14 flex text-lg font-extralight leading-6 tracking-widest">
+              {content.text}
+            </p>
+          </label>
         </div>
-      </CardContent>
+      </>
     );
   });
 
   return (
     <>
-      <Card className="mt-3 flex h-[120px] w-full justify-between rounded-sm bg-[#E2E8F0] shadow-none">
-        {current > 0 ? (
+      <div className="relative flex h-[120px] w-full justify-between rounded-b-sm bg-[#E2E8F0] py-2">
+        {currentSubtitle > 0 ? (
           <button onClick={previousCard} className="pl-3">
-            <ChevronsLeft className="h-8 w-8" />
+            <ChevronsLeft className="h-14 w-14 hover:cursor-pointer" />
           </button>
         ) : (
-          <button className="disabled pl-3 opacity-40" disabled>
-            <ChevronsLeft className="h-8 w-8" />
+          <button className="disabled pl-3 opacity-20" disabled>
+            <ChevronsLeft className="h-14 w-14" />
           </button>
         )}
-        {subtitleCard[current]}
-        {curTime}
-        {current < subtitleList.length - 1 ? (
+        {subtitleCard[currentSubtitle]}
+        {currentSubtitle < subtitleList.length - 1 ? (
           <button onClick={nextCard} className="pr-3">
-            <ChevronsRight className="h-8 w-8" />
+            <ChevronsRight className="h-14 w-14 hover:cursor-pointer" />
           </button>
         ) : (
-          <button className="disabled pr-3" disabled>
-            <ChevronsRight className="h-8 w-8" />
+          <button className="disabled pr-3 opacity-20" disabled>
+            <ChevronsRight className="h-14 w-14" />
           </button>
         )}
-      </Card>
+      </div>
     </>
   );
 };

@@ -1,20 +1,40 @@
 "use client";
 
-import React from "react";
 import "../../style/tiptap.css";
 import { BubbleMenu, useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import Placeholder from "@tiptap/extension-placeholder";
-import { Bold, UnderlineIcon, ItalicIcon, HighlighterIcon } from "lucide-react";
+import {
+  Bold,
+  UnderlineIcon,
+  ItalicIcon,
+  HighlighterIcon,
+  PlusSquare,
+  MinusSquare,
+} from "lucide-react";
 
 type Props = {
-  content: JSX.Element;
+  time: string | undefined;
+  text: string | undefined;
 };
 
-const TiptapEditor = ({ content }: Props) => {
-  const initialcontent = `<div><p className="${content.props.className}">${content.props.children}</p><p></p></div>`;
+const TiptapEditor = ({ time, text }: Props) => {
+  const initialContent = () => {
+    if (time && text)
+      return `<div className="relative overflow-hidden py-0">
+            <input id="check2" type="checkbox" className="open-check2 hidden" />
+            <div className="open-content2">
+              <p className="px-1">${text}</p>
+              <p></p>
+            </div>
+            <label
+              htmlFor="check2"
+              className="open-label2 absolute right-0 top-0 hover:cursor-pointer"
+            ></label>
+          </div>`;
+  };
 
   const editor = useEditor({
     extensions: [
@@ -25,11 +45,10 @@ const TiptapEditor = ({ content }: Props) => {
         placeholder: "ここにメモを入力",
       }),
     ],
-    content: initialcontent,
+    content: initialContent(),
     editorProps: {
       attributes: {
-        class:
-          "relative rounded-sm p-2 [&>*]:px-1 [&>*]:py-2 before:absolute before:w-full before:bottom-[-10px] before:left-0 before:border-[1px] before:border-dashed before:border-slate-400",
+        class: "relative rounded-sm pl-2 pr-5 [&>*]:px-1 pb-1 ",
       },
     },
   });
@@ -37,7 +56,7 @@ const TiptapEditor = ({ content }: Props) => {
   return (
     <>
       <div>
-        {/* バブルメニュー */}
+        {/* バブルメニュー ==================================================================*/}
         {editor && (
           <BubbleMenu
             className="flex gap-2 rounded-lg border-[1px] border-black bg-white px-3 py-1"
