@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { useRecoilState } from "recoil";
 import { currentTimeState } from "@/lib/atoms/getCurrentTime";
+import { Youtube } from "lucide-react";
 
 type Props = {
   url: string;
@@ -23,11 +24,9 @@ const VideoPlayer = ({ url }: Props) => {
   }, []);
 
   const playerOptions = {
-    height: "100%",
-    width: "100%",
     playerVars: {
       autoplay: 0,
-      controls: true,
+      controls: 0,
       rel: 0,
     },
   };
@@ -43,7 +42,7 @@ const VideoPlayer = ({ url }: Props) => {
           config={{ youtube: playerOptions }}
           width="100%"
           height="100%"
-          // controls={true}
+          playIcon={<button>saisei</button>}
           onProgress={(progress) => {
             setCurrentTime(progress.playedSeconds);
           }}
